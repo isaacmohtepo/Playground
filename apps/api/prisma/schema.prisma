@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  AGENCY_ADMIN
+  AGENCY_MEMBER
+}
+
+enum CampaignState {
+  PLANNING
+  ACTIVE
+  COMPLETED
+  PAUSED
+}
+
+enum ApprovalState {
+  DRAFT
+  PENDING_REVIEW
+  CHANGES_REQUESTED
+  APPROVED
+}
+
+enum AssetKind {
+  IMAGE
+  VIDEO
+  PDF
+  LANDING_PAGE
+  SOCIAL
+}
+
+enum CommentAuthorType {
+  AGENCY_USER
+  CLIENT_PUBLIC
+}
+
+enum NotificationType {
+  NEW_COMMENT
+  NEW_VERSION
+  ASSET_APPROVED
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  role         UserRole   @default(AGENCY_MEMBER)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  comments     Comment[]
+  approvals    Approval[]
+}
+
+model Client {
+  id        String     @id @default(cuid())
+  name      String
+  company   String
+  email     String
+  logoUrl   String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  campaigns Campaign[]
+}
+
+model Campaign {
+  id          String        @id @default(cuid())
+  clientId    String
+  name        String
+  description String?
+  startDate   DateTime?
+  state       CampaignState @default(PLANNING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  assets      CreativeAsset[]
+}
+
+model CreativeAsset {
+  id          String        @id @default(cuid())
+  campaignId  String
+  title       String
+  kind        AssetKind
+  currentState ApprovalState @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  campaign    Campaign      @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  versions    AssetVersion[]
+  approvals   Approval[]
+  reviewLinks ReviewLink[]
+}
+
+model AssetVersion {
+  id          String        @id @default(cuid())
+  assetId     String
+  versionNum  Int
+  fileUrl     String
+  thumbUrl    String?
+  notes       String?
+  state       ApprovalState @default(DRAFT)
+  createdAt   DateTime      @default(now())
+
+  asset       CreativeAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  comments    Comment[]
+  approvals   Approval[]
+
+  @@unique([assetId, versionNum])
+}
+
+model Comment {
+  id              String            @id @default(cuid())
+  versionId       String
+  parentId        String?
+  authorType      CommentAuthorType
+  authorUserId    String?
+  authorName      String?
+  authorEmail     String?
+  body            String
+  x               Float
+  y               Float
+  timestampSec    Float?
+  isResolved      Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  version         AssetVersion      @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  parent          Comment?          @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
+  replies         Comment[]         @relation("CommentThread")
+  authorUser      User?             @relation(fields: [authorUserId], references: [id], onDelete: SetNull)
+}
+
+model Approval {
+  id              String        @id @default(cuid())
+  assetId         String
+  versionId       String
+  approverUserId  String?
+  approverName    String?
+  approverEmail   String?
+  state           ApprovalState
+  note            String?
+  createdAt       DateTime      @default(now())
+
+  asset           CreativeAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  version         AssetVersion  @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  approverUser    User?         @relation(fields: [approverUserId], references: [id], onDelete: SetNull)
+}
+
+model ReviewLink {
+  id           String     @id @default(cuid())
+  assetId      String
+  token        String     @unique
+  expiresAt    DateTime?
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+
+  asset        CreativeAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+}
+
+model NotificationEvent {
+  id         String           @id @default(cuid())
+  type       NotificationType
+  recipient  String
+  payload    Json
+  sentAt     DateTime?
+  createdAt  DateTime         @default(now())
+}

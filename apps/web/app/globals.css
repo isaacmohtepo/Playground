@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-start: #f6fbff;
+  --bg-end: #edf3ff;
+}
+
+body {
+  @apply text-slate-900;
+  background: radial-gradient(circle at 15% 20%, var(--bg-start), var(--bg-end) 45%, #f9fafb 100%);
+  min-height: 100vh;
+}
+
+.container-page {
+  @apply mx-auto w-full max-w-6xl px-4 py-8;
+}
+
+.card {
+  @apply rounded-2xl border border-slate-200 bg-white/90 shadow-card backdrop-blur;
+}
