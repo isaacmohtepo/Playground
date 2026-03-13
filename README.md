@@ -106,6 +106,9 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/creativeflow?schema=
 JWT_SECRET="super-secret-jwt-key"
 PORT=4000
 APP_URL="http://localhost:3000"
+WEB_URL="http://localhost:3000"
+FRONTEND_URL="http://localhost:3000"
+CORS_ORIGINS="http://localhost:3000"
 DEFAULT_ADMIN_EMAIL="admin@creativeflow.com"
 DEFAULT_ADMIN_PASSWORD="admin123"
 DEFAULT_ADMIN_NAME="CreativeFlow Admin"
@@ -144,6 +147,10 @@ npm run dev:web
 Abrir `http://localhost:3000`.
 
 Credenciales por defecto: `admin@creativeflow.com` / `admin123`.
+
+## Endpoint de salud
+
+- `GET /health` responde estado del servicio para monitoreo y health checks de Render/Vercel.
 
 ## Producción
 

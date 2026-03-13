@@ -8,6 +8,7 @@ import { AssetsModule } from "./modules/assets/assets.module";
 import { CommentsModule } from "./modules/comments/comments.module";
 import { ReviewModule } from "./modules/review/review.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
+import { HealthModule } from "./modules/health/health.module";
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { NotificationsModule } from "./modules/notifications/notifications.modul
     AssetsModule,
     CommentsModule,
     ReviewModule,
-    NotificationsModule
+    NotificationsModule,
+    HealthModule
   ],
   providers: [PrismaService]
 })
