@@ -73,27 +73,41 @@ export default function PublicReviewPage() {
   }
 
   return (
-    <div className="container-page space-y-6">
-      <section className="card-strong p-6">
-        <h2 className="font-[var(--font-display)] text-3xl font-semibold">Revision de pieza</h2>
-        <p className="mt-1 text-sm muted">
-          {data?.asset?.title} - v{data?.latestVersion?.versionNum}
-        </p>
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Tu nombre" />
-          <input className="input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Tu email" />
+    <main className="min-h-screen bg-slate-950 px-3 py-3 text-slate-100 md:px-4">
+      <section className="mb-3 rounded-2xl border border-slate-700 bg-slate-900/80 p-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="font-[var(--font-display)] text-2xl font-semibold">Revision de pieza</h2>
+            <p className="mt-1 text-sm text-slate-300">
+              {data?.asset?.title} - v{data?.latestVersion?.versionNum}
+            </p>
+          </div>
+          <div className="grid w-full max-w-md gap-2 md:grid-cols-2">
+            <input
+              className="w-full rounded-xl border border-slate-600 bg-slate-950/70 px-4 py-2.5 text-sm text-slate-100 outline-none focus:border-brand-400"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Tu nombre"
+            />
+            <input
+              className="w-full rounded-xl border border-slate-600 bg-slate-950/70 px-4 py-2.5 text-sm text-slate-100 outline-none focus:border-brand-400"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Tu email"
+            />
+          </div>
         </div>
         <div className="mt-4 flex gap-2">
-          <button className="btn !bg-amber-500 !text-white hover:brightness-105" onClick={() => approve("CHANGES_REQUESTED")}>
+          <button className="btn rounded-xl bg-amber-500 px-3 py-2 text-xs font-semibold text-white hover:brightness-105" onClick={() => approve("CHANGES_REQUESTED")}>
             Solicitar cambios
           </button>
-          <button className="btn !bg-emerald-600 !text-white hover:brightness-105" onClick={() => approve("APPROVED")}>
+          <button className="btn rounded-xl bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:brightness-105" onClick={() => approve("APPROVED")}>
             Aprobar pieza
           </button>
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
+      <section className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px]">
         {data?.latestVersion?.fileUrl ? (
           <CreativeViewer
             fileUrl={data.latestVersion.fileUrl}
@@ -102,9 +116,10 @@ export default function PublicReviewPage() {
             onCreateComment={setDraftPin}
             onSelectComment={setSelectedCommentId}
             selectedCommentId={selectedCommentId}
+            studioMode
           />
         ) : (
-          <div className="card p-6 text-sm muted">No hay version disponible para revision.</div>
+          <div className="rounded-2xl border border-slate-700 bg-slate-900/80 p-6 text-sm text-slate-300">No hay version disponible para revision.</div>
         )}
 
         <CommentsPanel
@@ -116,8 +131,9 @@ export default function PublicReviewPage() {
           onResolve={resolve}
           onSelectComment={setSelectedCommentId}
           showResolveToggle={false}
+          studioMode
         />
       </section>
-    </div>
+    </main>
   );
 }

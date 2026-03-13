@@ -19,6 +19,7 @@ interface CreativeViewerProps {
   onCreateComment: (payload: { x: number; y: number; timestampSec?: number }) => void;
   onSelectComment: (id: string) => void;
   selectedCommentId?: string;
+  studioMode?: boolean;
 }
 
 function guessKind(url: string) {
@@ -29,7 +30,7 @@ function guessKind(url: string) {
   return "LANDING_PAGE";
 }
 
-export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, onSelectComment, selectedCommentId }: CreativeViewerProps) {
+export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, onSelectComment, selectedCommentId, studioMode = false }: CreativeViewerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const effectiveKind = assetKind ?? guessKind(fileUrl);
   const pins = useMemo(
@@ -69,9 +70,11 @@ export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, 
   }
 
   return (
-    <div className="card p-4">
+    <div className={`${studioMode ? "h-full rounded-2xl border border-slate-700 bg-slate-900/80 p-3" : "card p-4"}`}>
       <div
-        className={`relative overflow-hidden rounded-2xl border border-slate-200 bg-white ${effectiveKind === "PDF" || effectiveKind === "LANDING_PAGE" ? "h-[560px]" : "aspect-video"}`}
+        className={`relative overflow-hidden rounded-2xl ${
+          studioMode ? "border border-slate-700 bg-slate-950 h-[calc(100vh-170px)]" : "border border-slate-200 bg-white"
+        } ${!studioMode && (effectiveKind === "PDF" || effectiveKind === "LANDING_PAGE") ? "h-[560px]" : !studioMode ? "aspect-video" : ""}`}
         onClick={handleClick}
       >
         {renderMedia()}
@@ -91,7 +94,7 @@ export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, 
           </button>
         ))}
       </div>
-      <p className="mt-3 text-xs muted">
+      <p className={`mt-3 text-xs ${studioMode ? "text-slate-300" : "muted"}`}>
         Haz click en cualquier area del creativo para crear un comentario visual.
         {(effectiveKind === "LANDING_PAGE" || effectiveKind === "PDF") && (
           <>

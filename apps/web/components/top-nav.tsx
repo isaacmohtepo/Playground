@@ -10,6 +10,11 @@ const links = [
 
 export function TopNav() {
   const pathname = usePathname();
+  const isStudioRoute = (pathname.includes("/assets/") && pathname.includes("/versions/")) || pathname.startsWith("/review/");
+
+  if (isStudioRoute) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-20 border-b border-white/60 bg-white/60 backdrop-blur-2xl">
