@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Image from "next/image";
 
 type CommentItem = {
   id: string;
@@ -39,7 +40,7 @@ export function CreativeViewer({ fileUrl, comments, onCreateComment, onSelectCom
   return (
     <div className="card p-4">
       <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50" onClick={handleClick}>
-        <img src={fileUrl} alt="Creative preview" className="h-auto w-full object-contain" />
+        <Image src={fileUrl} alt="Creative preview" width={1600} height={900} className="h-auto w-full object-contain" unoptimized />
         {pins.map((pin) => (
           <button
             key={pin.id}

@@ -57,9 +57,9 @@ export default function PublicReviewPage() {
   return (
     <div className="container-page space-y-6">
       <section className="card p-5">
-        <h2 className="text-2xl font-semibold">Revisión de pieza</h2>
+        <h2 className="text-2xl font-semibold">Revision de pieza</h2>
         <p className="text-sm text-slate-500">
-          {data?.asset?.title} · v{data?.latestVersion?.versionNum}
+          {data?.asset?.title} - v{data?.latestVersion?.versionNum}
         </p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <input className="rounded-lg border border-slate-200 px-3 py-2 text-sm" value={name} onChange={(e) => setName(e.target.value)} placeholder="Tu nombre" />
@@ -85,7 +85,7 @@ export default function PublicReviewPage() {
             selectedCommentId={selectedCommentId}
           />
         ) : (
-          <div className="card p-6 text-sm text-slate-500">No hay versión disponible para revisión.</div>
+          <div className="card p-6 text-sm text-slate-500">No hay version disponible para revision.</div>
         )}
 
         <CommentsPanel
@@ -96,6 +96,7 @@ export default function PublicReviewPage() {
           onReply={reply}
           onResolve={resolve}
           onSelectComment={setSelectedCommentId}
+          showResolveToggle={false}
         />
       </section>
     </div>

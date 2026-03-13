@@ -21,6 +21,7 @@ interface CommentsPanelProps {
   onReply: (commentId: string, body: string) => Promise<void>;
   onResolve: (commentId: string, isResolved: boolean) => Promise<void>;
   onSelectComment: (id: string) => void;
+  showResolveToggle?: boolean;
 }
 
 export function CommentsPanel({
@@ -30,7 +31,8 @@ export function CommentsPanel({
   onCreateComment,
   onReply,
   onResolve,
-  onSelectComment
+  onSelectComment,
+  showResolveToggle = true
 }: CommentsPanelProps) {
   const [newCommentBody, setNewCommentBody] = useState("");
   const [replyBodies, setReplyBodies] = useState<Record<string, string>>({});
@@ -40,7 +42,7 @@ export function CommentsPanel({
       <h3 className="text-lg font-semibold">Comentarios</h3>
       {draftPin ? (
         <div className="mt-3 rounded-lg border border-brand-200 bg-brand-50 p-3">
-          <p className="text-xs text-brand-700">Nuevo pin en X: {draftPin.x}% · Y: {draftPin.y}%</p>
+          <p className="text-xs text-brand-700">Nuevo pin en X: {draftPin.x}% - Y: {draftPin.y}%</p>
           <textarea
             className="mt-2 w-full rounded-lg border border-brand-200 px-3 py-2 text-sm"
             rows={3}
@@ -74,15 +76,17 @@ export function CommentsPanel({
           >
             <div className="flex items-start justify-between gap-3">
               <p className="text-sm">{comment.body}</p>
-              <button
-                className={`rounded-md px-2 py-1 text-xs font-medium ${comment.isResolved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  await onResolve(comment.id, !comment.isResolved);
-                }}
-              >
-                {comment.isResolved ? "Resuelto" : "Pendiente"}
-              </button>
+              {showResolveToggle ? (
+                <button
+                  className={`rounded-md px-2 py-1 text-xs font-medium ${comment.isResolved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    await onResolve(comment.id, !comment.isResolved);
+                  }}
+                >
+                  {comment.isResolved ? "Resuelto" : "Pendiente"}
+                </button>
+              ) : null}
             </div>
             <p className="mt-2 text-xs text-slate-500">
               Pin ({comment.x.toFixed(1)}%, {comment.y.toFixed(1)}%)
