@@ -39,19 +39,15 @@ export function CommentsPanel({
 
   return (
     <aside className="card flex h-[80vh] flex-col p-4">
-      <h3 className="text-lg font-semibold">Comentarios</h3>
+      <h3 className="font-[var(--font-display)] text-xl font-semibold">Comentarios</h3>
       {draftPin ? (
-        <div className="mt-3 rounded-lg border border-brand-200 bg-brand-50 p-3">
-          <p className="text-xs text-brand-700">Nuevo pin en X: {draftPin.x}% - Y: {draftPin.y}%</p>
-          <textarea
-            className="mt-2 w-full rounded-lg border border-brand-200 px-3 py-2 text-sm"
-            rows={3}
-            value={newCommentBody}
-            onChange={(e) => setNewCommentBody(e.target.value)}
-            placeholder="Describe el cambio solicitado"
-          />
+        <div className="mt-3 rounded-2xl border border-brand-200 bg-brand-50 p-3">
+          <p className="text-xs text-brand-700">
+            Nuevo pin en X: {draftPin.x}% - Y: {draftPin.y}%
+          </p>
+          <textarea className="input mt-2 min-h-20" rows={3} value={newCommentBody} onChange={(e) => setNewCommentBody(e.target.value)} placeholder="Describe el cambio solicitado" />
           <button
-            className="mt-2 rounded-lg bg-brand-500 px-3 py-2 text-sm font-medium text-white"
+            className="btn-primary mt-2"
             onClick={async () => {
               if (!newCommentBody.trim()) {
                 return;
@@ -64,21 +60,25 @@ export function CommentsPanel({
           </button>
         </div>
       ) : (
-        <p className="mt-3 text-sm text-slate-500">Selecciona una zona del creativo para comentar.</p>
+        <p className="mt-3 text-sm muted">Selecciona una zona del creativo para comentar.</p>
       )}
 
       <div className="mt-4 flex-1 space-y-3 overflow-auto">
         {comments.map((comment) => (
           <div
             key={comment.id}
-            className={`rounded-lg border p-3 ${selectedCommentId === comment.id ? "border-brand-500 bg-brand-50" : "border-slate-200 bg-white"}`}
+            className={`rounded-2xl border p-3 transition ${
+              selectedCommentId === comment.id ? "border-brand-400 bg-brand-50" : "border-slate-200 bg-white"
+            }`}
             onClick={() => onSelectComment(comment.id)}
           >
             <div className="flex items-start justify-between gap-3">
-              <p className="text-sm">{comment.body}</p>
+              <p className="text-sm text-slate-800">{comment.body}</p>
               {showResolveToggle ? (
                 <button
-                  className={`rounded-md px-2 py-1 text-xs font-medium ${comment.isResolved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}
+                  className={`rounded-lg px-2 py-1 text-xs font-semibold ${
+                    comment.isResolved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                  }`}
                   onClick={async (e) => {
                     e.stopPropagation();
                     await onResolve(comment.id, !comment.isResolved);
@@ -88,25 +88,25 @@ export function CommentsPanel({
                 </button>
               ) : null}
             </div>
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs muted">
               Pin ({comment.x.toFixed(1)}%, {comment.y.toFixed(1)}%)
             </p>
             <div className="mt-2 space-y-2">
               {comment.replies?.map((reply) => (
-                <p key={reply.id} className="rounded-md bg-slate-50 px-2 py-1 text-xs text-slate-700">
+                <p key={reply.id} className="rounded-lg bg-slate-50 px-2 py-1 text-xs text-slate-700">
                   {reply.body}
                 </p>
               ))}
             </div>
             <div className="mt-2 flex gap-2">
               <input
-                className="flex-1 rounded-md border border-slate-200 px-2 py-1 text-xs"
+                className="input !px-2 !py-1 text-xs"
                 placeholder="Responder hilo"
                 value={replyBodies[comment.id] || ""}
                 onChange={(e) => setReplyBodies((prev) => ({ ...prev, [comment.id]: e.target.value }))}
               />
               <button
-                className="rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-white"
+                className="btn-dark !px-3 !py-1.5 !text-xs"
                 onClick={async (e) => {
                   e.stopPropagation();
                   const body = replyBodies[comment.id]?.trim();

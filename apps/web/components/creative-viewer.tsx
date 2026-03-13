@@ -39,14 +39,14 @@ export function CreativeViewer({ fileUrl, comments, onCreateComment, onSelectCom
 
   return (
     <div className="card p-4">
-      <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50" onClick={handleClick}>
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white" onClick={handleClick}>
         <Image src={fileUrl} alt="Creative preview" width={1600} height={900} className="h-auto w-full object-contain" unoptimized />
         {pins.map((pin) => (
           <button
             key={pin.id}
             style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
-            className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full px-2 py-1 text-xs font-bold text-white ${
-              selectedCommentId === pin.id ? "bg-brand-700" : pin.isResolved ? "bg-emerald-500" : "bg-brand-500"
+            className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full px-2 py-1 text-xs font-bold text-white shadow ${
+              selectedCommentId === pin.id ? "bg-slate-900" : pin.isResolved ? "bg-emerald-500" : "bg-brand-500"
             }`}
             onClick={(e) => {
               e.stopPropagation();
@@ -57,7 +57,7 @@ export function CreativeViewer({ fileUrl, comments, onCreateComment, onSelectCom
           </button>
         ))}
       </div>
-      <p className="mt-2 text-xs text-slate-500">Haz clic sobre cualquier área del creativo para crear un comentario visual.</p>
+      <p className="mt-3 text-xs muted">Haz click en cualquier area del creativo para crear un comentario visual.</p>
     </div>
   );
 }

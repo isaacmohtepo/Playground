@@ -56,20 +56,20 @@ export default function PublicReviewPage() {
 
   return (
     <div className="container-page space-y-6">
-      <section className="card p-5">
-        <h2 className="text-2xl font-semibold">Revision de pieza</h2>
-        <p className="text-sm text-slate-500">
+      <section className="card-strong p-6">
+        <h2 className="font-[var(--font-display)] text-3xl font-semibold">Revision de pieza</h2>
+        <p className="mt-1 text-sm muted">
           {data?.asset?.title} - v{data?.latestVersion?.versionNum}
         </p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <input className="rounded-lg border border-slate-200 px-3 py-2 text-sm" value={name} onChange={(e) => setName(e.target.value)} placeholder="Tu nombre" />
-          <input className="rounded-lg border border-slate-200 px-3 py-2 text-sm" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Tu email" />
+          <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Tu nombre" />
+          <input className="input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Tu email" />
         </div>
         <div className="mt-4 flex gap-2">
-          <button className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white" onClick={() => approve("CHANGES_REQUESTED")}>
+          <button className="btn !bg-amber-500 !text-white hover:brightness-105" onClick={() => approve("CHANGES_REQUESTED")}>
             Solicitar cambios
           </button>
-          <button className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white" onClick={() => approve("APPROVED")}>
+          <button className="btn !bg-emerald-600 !text-white hover:brightness-105" onClick={() => approve("APPROVED")}>
             Aprobar pieza
           </button>
         </div>
@@ -85,7 +85,7 @@ export default function PublicReviewPage() {
             selectedCommentId={selectedCommentId}
           />
         ) : (
-          <div className="card p-6 text-sm text-slate-500">No hay version disponible para revision.</div>
+          <div className="card p-6 text-sm muted">No hay version disponible para revision.</div>
         )}
 
         <CommentsPanel

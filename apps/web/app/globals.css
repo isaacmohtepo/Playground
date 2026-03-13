@@ -3,20 +3,93 @@
 @tailwind utilities;
 
 :root {
-  --bg-start: #f6fbff;
-  --bg-end: #edf3ff;
+  --bg-1: #f3f8ff;
+  --bg-2: #ecf4ff;
+  --bg-3: #f8fafc;
+  --text-1: #10203f;
+  --text-2: #4d5f80;
+  --line: rgba(145, 170, 216, 0.34);
+  --brand-1: #1888ff;
+  --brand-2: #0153cc;
+  --brand-soft: rgba(24, 136, 255, 0.12);
+  --mint-soft: rgba(20, 184, 166, 0.14);
+  --warn-soft: rgba(251, 146, 60, 0.18);
 }
 
 body {
-  @apply text-slate-900;
-  background: radial-gradient(circle at 15% 20%, var(--bg-start), var(--bg-end) 45%, #f9fafb 100%);
+  color: var(--text-1);
+  background:
+    radial-gradient(circle at 8% 2%, #d8ebff 0%, transparent 22%),
+    radial-gradient(circle at 92% 6%, #d6fff8 0%, transparent 22%),
+    linear-gradient(160deg, var(--bg-1), var(--bg-2) 38%, var(--bg-3) 100%);
   min-height: 100vh;
 }
 
 .container-page {
-  @apply mx-auto w-full max-w-6xl px-4 py-8;
+  @apply mx-auto w-full max-w-6xl px-4 py-8 md:px-6;
 }
 
 .card {
-  @apply rounded-2xl border border-slate-200 bg-white/90 shadow-card backdrop-blur;
+  @apply rounded-3xl border bg-white/80 shadow-card backdrop-blur-xl;
+  border-color: var(--line);
+}
+
+.card-strong {
+  @apply rounded-3xl border bg-white/95 shadow-card;
+  border-color: var(--line);
+}
+
+.headline {
+  @apply text-3xl font-semibold tracking-tight md:text-4xl;
+}
+
+.muted {
+  color: var(--text-2);
+}
+
+.input {
+  @apply w-full rounded-xl border bg-white/90 px-4 py-2.5 text-sm outline-none transition;
+  border-color: var(--line);
+}
+
+.input:focus {
+  border-color: var(--brand-1);
+  box-shadow: 0 0 0 4px var(--brand-soft);
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition;
+}
+
+.btn-primary {
+  @apply btn text-white;
+  background: linear-gradient(130deg, var(--brand-1), var(--brand-2));
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+.btn-dark {
+  @apply btn bg-slate-900 text-white hover:bg-slate-800;
+}
+
+.btn-soft {
+  @apply btn text-slate-900;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(235, 242, 255, 0.9));
+  border: 1px solid var(--line);
+}
+
+.pill {
+  @apply rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide;
+}
+
+.pill-pending {
+  background: var(--warn-soft);
+  color: #9a4d05;
+}
+
+.pill-ok {
+  background: var(--mint-soft);
+  color: #0f766e;
 }

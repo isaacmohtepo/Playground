@@ -106,6 +106,9 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/creativeflow?schema=
 JWT_SECRET="super-secret-jwt-key"
 PORT=4000
 APP_URL="http://localhost:3000"
+DEFAULT_ADMIN_EMAIL="admin@creativeflow.com"
+DEFAULT_ADMIN_PASSWORD="admin123"
+DEFAULT_ADMIN_NAME="CreativeFlow Admin"
 ```
 
 #### Web (`apps/web/.env.local`)
@@ -139,6 +142,8 @@ npm run dev:web
 ```
 
 Abrir `http://localhost:3000`.
+
+Credenciales por defecto: `admin@creativeflow.com` / `admin123`.
 
 ## Producción
 

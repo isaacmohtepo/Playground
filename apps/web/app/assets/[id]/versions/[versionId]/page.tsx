@@ -48,37 +48,41 @@ export default function AssetVersionReviewPage() {
   }
 
   if (!token) {
-    return <div className="container-page"><p className="card p-5">Inicia sesión desde Dashboard.</p></div>;
+    return (
+      <div className="container-page">
+        <p className="card p-5">Inicia sesion desde Dashboard.</p>
+      </div>
+    );
   }
 
   return (
     <div className="container-page grid gap-6 lg:grid-cols-[1fr_360px]">
       <section className="space-y-4">
         <div className="card p-5">
-          <h2 className="text-xl font-semibold">{versionData?.asset?.title}</h2>
-          <p className="text-sm text-slate-500">
-            v{versionData?.versionNum} · Estado: {versionData?.state}
+          <h2 className="font-[var(--font-display)] text-2xl font-semibold">{versionData?.asset?.title}</h2>
+          <p className="mt-1 text-sm muted">
+            v{versionData?.versionNum} - Estado: {versionData?.state}
           </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-medium text-white" onClick={() => changeApprovalState("PENDING_REVIEW")}>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button className="btn-soft !text-xs" onClick={() => changeApprovalState("PENDING_REVIEW")}>
               Marcar pendiente
             </button>
-            <button className="rounded-lg bg-amber-500 px-3 py-2 text-xs font-medium text-white" onClick={() => changeApprovalState("CHANGES_REQUESTED")}>
+            <button className="btn !bg-amber-500 !text-xs !text-white hover:brightness-105" onClick={() => changeApprovalState("CHANGES_REQUESTED")}>
               Solicitar cambios
             </button>
-            <button className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-medium text-white" onClick={() => changeApprovalState("APPROVED")}>
-              Aprobar versión
+            <button className="btn !bg-emerald-600 !text-xs !text-white hover:brightness-105" onClick={() => changeApprovalState("APPROVED")}>
+              Aprobar version
             </button>
           </div>
         </div>
 
         {versionData?.asset?.versions?.length > 1 ? (
           <div className="card p-5">
-            <h3 className="text-lg font-semibold">Historial de versiones</h3>
+            <h3 className="font-[var(--font-display)] text-xl font-semibold">Historial de versiones</h3>
             <div className="mt-3 grid gap-2">
               {versionData.asset.versions.map((version: any) => (
-                <div key={version.id} className="rounded-lg border border-slate-200 p-3 text-sm">
-                  v{version.versionNum} · {version.state}
+                <div key={version.id} className="rounded-xl border border-slate-200 bg-white/75 p-3 text-sm">
+                  v{version.versionNum} - {version.state}
                 </div>
               ))}
             </div>

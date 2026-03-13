@@ -34,38 +34,42 @@ export default function ClientDetailPage() {
   }
 
   if (!token) {
-    return <div className="container-page"><p className="card p-5">Inicia sesión desde Dashboard.</p></div>;
+    return (
+      <div className="container-page">
+        <p className="card p-5">Inicia sesion desde Dashboard.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="container-page grid gap-6 lg:grid-cols-[1fr_360px]">
-      <section className="card p-5">
-        <h2 className="text-2xl font-semibold">{data?.company}</h2>
-        <p className="text-sm text-slate-500">{data?.name} · {data?.email}</p>
-        <h3 className="mt-6 text-lg font-semibold">Campañas</h3>
+    <div className="container-page grid gap-6 lg:grid-cols-[1fr_380px]">
+      <section className="card p-6">
+        <h2 className="font-[var(--font-display)] text-3xl font-semibold">{data?.company}</h2>
+        <p className="mt-1 text-sm muted">
+          {data?.name} - {data?.email}
+        </p>
+        <div className="mt-6 flex items-center justify-between">
+          <h3 className="font-[var(--font-display)] text-2xl font-semibold">Campanas</h3>
+          <span className="pill bg-slate-100 text-slate-700">{data?.campaigns?.length ?? 0} activas</span>
+        </div>
         <div className="mt-4 grid gap-3">
           {data?.campaigns?.map((campaign: any) => (
-            <Link key={campaign.id} href={`/campaigns/${campaign.id}`} className="rounded-xl border border-slate-200 p-4 hover:border-brand-500">
-              <p className="font-medium">{campaign.name}</p>
-              <p className="text-sm text-slate-500">{campaign.description || "Sin descripción"}</p>
-              <p className="mt-1 text-xs uppercase tracking-wide text-slate-400">{campaign.state}</p>
+            <Link key={campaign.id} href={`/campaigns/${campaign.id}`} className="group rounded-2xl border border-slate-200 bg-white/70 p-4 transition hover:border-brand-500">
+              <p className="font-semibold group-hover:text-brand-700">{campaign.name}</p>
+              <p className="text-sm muted">{campaign.description || "Sin descripcion"}</p>
+              <p className="mt-2 text-xs uppercase tracking-[0.18em] text-slate-400">{campaign.state}</p>
             </Link>
           ))}
         </div>
       </section>
 
-      <aside className="card p-5">
-        <h3 className="text-lg font-semibold">Nueva campaña</h3>
-        <form onSubmit={createCampaign} className="mt-4 grid gap-3">
-          <input className="rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Nombre de campaña" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <textarea
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
-            placeholder="Descripción"
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-          />
-          <input className="rounded-lg border border-slate-200 px-3 py-2 text-sm" type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} />
-          <button className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white">Crear campaña</button>
+      <aside className="card-strong p-6">
+        <h3 className="font-[var(--font-display)] text-2xl font-semibold">Nueva campana</h3>
+        <form onSubmit={createCampaign} className="mt-5 grid gap-3">
+          <input className="input" placeholder="Nombre de campana" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <textarea className="input min-h-24" placeholder="Descripcion" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+          <input className="input" type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} />
+          <button className="btn-primary">Crear campana</button>
         </form>
       </aside>
     </div>
