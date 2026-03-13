@@ -2,9 +2,22 @@ import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 
+function normalizeOrigin(origin: string) {
+  return origin.trim().replace(/\/+$/, "").toLowerCase();
+}
+
+function matchWildcardOrigin(origin: string, pattern: string) {
+  const cleanPattern = normalizeOrigin(pattern);
+  if (!cleanPattern.includes("*")) {
+    return false;
+  }
+  const regex = new RegExp(`^${cleanPattern.replace(/\./g, "\\.").replace(/\*/g, ".*")}$`, "i");
+  return regex.test(normalizeOrigin(origin));
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const explicitOrigins = [
+  const rawOrigins = [
     process.env.APP_URL,
     process.env.WEB_URL,
     process.env.FRONTEND_URL,
@@ -12,6 +25,7 @@ async function bootstrap() {
   ]
     .map((origin) => origin?.trim())
     .filter((origin): origin is string => Boolean(origin));
+  const explicitOrigins = rawOrigins.map((origin) => normalizeOrigin(origin));
 
   app.enableCors({
     origin: (origin, callback) => {
@@ -19,7 +33,11 @@ async function bootstrap() {
         callback(null, true);
         return;
       }
-      if (explicitOrigins.length === 0 || explicitOrigins.includes(origin)) {
+      const incomingOrigin = normalizeOrigin(origin);
+      const allowedByExact = explicitOrigins.includes(incomingOrigin);
+      const allowedByWildcard = rawOrigins.some((pattern) => matchWildcardOrigin(incomingOrigin, pattern));
+
+      if (explicitOrigins.length === 0 || allowedByExact || allowedByWildcard) {
         callback(null, true);
         return;
       }
