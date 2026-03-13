@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiGet, apiPost } from "../../../lib/api";
 import { CommentsPanel } from "../../../components/comments-panel";
 import { CreativeViewer } from "../../../components/creative-viewer";
+import { useToast } from "../../../components/toast-provider";
 
 export default function PublicReviewPage() {
   const params = useParams<{ token: string }>();
@@ -13,6 +14,7 @@ export default function PublicReviewPage() {
   const [selectedCommentId, setSelectedCommentId] = useState<string>();
   const [name, setName] = useState("Cliente");
   const [email, setEmail] = useState("cliente@example.com");
+  const { showToast } = useToast();
 
   const { data, refetch } = useQuery({
     queryKey: ["public-review", params.token],
@@ -21,25 +23,35 @@ export default function PublicReviewPage() {
 
   async function createComment(body: string) {
     if (!draftPin) return;
-    await apiPost(`/review/${params.token}/comments`, {
-      name,
-      email,
-      body,
-      x: draftPin.x,
-      y: draftPin.y,
-      timestampSec: draftPin.timestampSec
-    });
-    setDraftPin(null);
-    await refetch();
+    try {
+      await apiPost(`/review/${params.token}/comments`, {
+        name,
+        email,
+        body,
+        x: draftPin.x,
+        y: draftPin.y,
+        timestampSec: draftPin.timestampSec
+      });
+      setDraftPin(null);
+      await refetch();
+      showToast("Comentario enviado", "success");
+    } catch {
+      showToast("No fue posible enviar comentario", "error");
+    }
   }
 
   async function reply(commentId: string, body: string) {
-    await apiPost(`/review/${params.token}/comments/${commentId}/reply`, {
-      name,
-      email,
-      body
-    });
-    await refetch();
+    try {
+      await apiPost(`/review/${params.token}/comments/${commentId}/reply`, {
+        name,
+        email,
+        body
+      });
+      await refetch();
+      showToast("Respuesta enviada", "success");
+    } catch {
+      showToast("No fue posible responder", "error");
+    }
   }
 
   async function resolve() {
@@ -47,12 +59,17 @@ export default function PublicReviewPage() {
   }
 
   async function approve(state: "CHANGES_REQUESTED" | "APPROVED") {
-    await apiPost(`/review/${params.token}/approve`, {
-      name,
-      email,
-      state
-    });
-    await refetch();
+    try {
+      await apiPost(`/review/${params.token}/approve`, {
+        name,
+        email,
+        state
+      });
+      await refetch();
+      showToast(state === "APPROVED" ? "Pieza aprobada" : "Cambios solicitados", "success");
+    } catch {
+      showToast("No fue posible registrar decision", "error");
+    }
   }
 
   return (

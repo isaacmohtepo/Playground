@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet, apiPost, getStoredToken } from "../../../lib/api";
+import { useToast } from "../../../components/toast-provider";
 
 export default function CampaignDetailPage() {
   const params = useParams<{ id: string }>();
@@ -12,6 +13,7 @@ export default function CampaignDetailPage() {
   const [form, setForm] = useState({ title: "", kind: "IMAGE" });
   const [versionForm, setVersionForm] = useState({ assetId: "", versionNum: 1, fileUrl: "" });
   const [reviewLink, setReviewLink] = useState("");
+  const { showToast } = useToast();
 
   const { data, refetch } = useQuery({
     queryKey: ["campaign", params.id, token],
@@ -21,21 +23,36 @@ export default function CampaignDetailPage() {
 
   async function createAsset(e: React.FormEvent) {
     e.preventDefault();
-    await apiPost("/assets", { campaignId: params.id, ...form }, token);
-    setForm({ title: "", kind: "IMAGE" });
-    refetch();
+    try {
+      await apiPost("/assets", { campaignId: params.id, ...form }, token);
+      setForm({ title: "", kind: "IMAGE" });
+      await refetch();
+      showToast("Pieza creada", "success");
+    } catch {
+      showToast("No fue posible crear la pieza", "error");
+    }
   }
 
   async function createVersion(e: React.FormEvent) {
     e.preventDefault();
-    await apiPost(`/assets/${versionForm.assetId}/versions`, versionForm, token);
-    setVersionForm({ assetId: "", versionNum: 1, fileUrl: "" });
-    refetch();
+    try {
+      await apiPost(`/assets/${versionForm.assetId}/versions`, versionForm, token);
+      setVersionForm({ assetId: "", versionNum: 1, fileUrl: "" });
+      await refetch();
+      showToast("Version creada", "success");
+    } catch {
+      showToast("No fue posible crear la version", "error");
+    }
   }
 
   async function createReviewLink(assetId: string) {
-    const response = await apiPost<any>(`/assets/${assetId}/review-links`, {}, token);
-    setReviewLink(response.publicUrl);
+    try {
+      const response = await apiPost<any>(`/assets/${assetId}/review-links`, {}, token);
+      setReviewLink(response.publicUrl);
+      showToast("Link de revision generado", "success");
+    } catch {
+      showToast("No fue posible generar el link", "error");
+    }
   }
 
   if (!token) {

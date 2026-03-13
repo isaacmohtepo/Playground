@@ -5,11 +5,13 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet, apiPost, getStoredToken } from "../../../lib/api";
+import { useToast } from "../../../components/toast-provider";
 
 export default function ClientDetailPage() {
   const params = useParams<{ id: string }>();
   const [token] = useState<string>(() => (typeof window !== "undefined" ? getStoredToken() : ""));
   const [form, setForm] = useState({ name: "", description: "", startDate: "" });
+  const { showToast } = useToast();
 
   const { data, refetch } = useQuery({
     queryKey: ["client", params.id, token],
@@ -19,18 +21,23 @@ export default function ClientDetailPage() {
 
   async function createCampaign(e: React.FormEvent) {
     e.preventDefault();
-    await apiPost(
-      "/campaigns",
-      {
-        clientId: params.id,
-        name: form.name,
-        description: form.description,
-        startDate: form.startDate
-      },
-      token
-    );
-    setForm({ name: "", description: "", startDate: "" });
-    refetch();
+    try {
+      await apiPost(
+        "/campaigns",
+        {
+          clientId: params.id,
+          name: form.name,
+          description: form.description,
+          startDate: form.startDate
+        },
+        token
+      );
+      setForm({ name: "", description: "", startDate: "" });
+      await refetch();
+      showToast("Campana creada", "success");
+    } catch {
+      showToast("No fue posible crear la campana", "error");
+    }
   }
 
   if (!token) {

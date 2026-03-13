@@ -6,12 +6,14 @@ import { useQuery } from "@tanstack/react-query";
 import { apiGet, apiPost, getStoredToken } from "../../../../../lib/api";
 import { CommentsPanel } from "../../../../../components/comments-panel";
 import { CreativeViewer } from "../../../../../components/creative-viewer";
+import { useToast } from "../../../../../components/toast-provider";
 
 export default function AssetVersionReviewPage() {
   const params = useParams<{ id: string; versionId: string }>();
   const [token] = useState<string>(() => (typeof window !== "undefined" ? getStoredToken() : ""));
   const [draftPin, setDraftPin] = useState<{ x: number; y: number; timestampSec?: number } | null>(null);
   const [selectedCommentId, setSelectedCommentId] = useState<string>();
+  const { showToast } = useToast();
 
   const { data: versionData, refetch: refetchVersion } = useQuery({
     queryKey: ["asset-version", params.id, params.versionId, token],
@@ -27,29 +29,53 @@ export default function AssetVersionReviewPage() {
 
   async function createComment(body: string) {
     if (!draftPin) return;
-    await apiPost(`/comments/version/${params.versionId}`, {
-      body,
-      x: draftPin.x,
-      y: draftPin.y,
-      timestampSec: draftPin.timestampSec
-    }, token);
-    setDraftPin(null);
-    await refetchComments();
+    try {
+      await apiPost(
+        `/comments/version/${params.versionId}`,
+        {
+          body,
+          x: draftPin.x,
+          y: draftPin.y,
+          timestampSec: draftPin.timestampSec
+        },
+        token
+      );
+      setDraftPin(null);
+      await refetchComments();
+      showToast("Comentario creado", "success");
+    } catch {
+      showToast("No fue posible crear comentario", "error");
+    }
   }
 
   async function reply(commentId: string, body: string) {
-    await apiPost(`/comments/${commentId}/reply`, { body }, token);
-    await refetchComments();
+    try {
+      await apiPost(`/comments/${commentId}/reply`, { body }, token);
+      await refetchComments();
+      showToast("Respuesta enviada", "success");
+    } catch {
+      showToast("No fue posible responder", "error");
+    }
   }
 
   async function resolve(commentId: string, isResolved: boolean) {
-    await apiPost(`/comments/${commentId}/resolve`, { isResolved }, token, "PATCH");
-    await refetchComments();
+    try {
+      await apiPost(`/comments/${commentId}/resolve`, { isResolved }, token, "PATCH");
+      await refetchComments();
+      showToast(isResolved ? "Comentario marcado como resuelto" : "Comentario reabierto", "info");
+    } catch {
+      showToast("No fue posible actualizar comentario", "error");
+    }
   }
 
   async function changeApprovalState(state: "PENDING_REVIEW" | "CHANGES_REQUESTED" | "APPROVED") {
-    await apiPost(`/assets/${params.id}/versions/${params.versionId}/approve`, { state }, token);
-    await refetchVersion();
+    try {
+      await apiPost(`/assets/${params.id}/versions/${params.versionId}/approve`, { state }, token);
+      await refetchVersion();
+      showToast("Estado de aprobacion actualizado", "success");
+    } catch {
+      showToast("No fue posible actualizar aprobacion", "error");
+    }
   }
 
   if (!token) {

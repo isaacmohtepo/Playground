@@ -37,7 +37,14 @@ function LineGhost() {
 }
 
 function SideMenu() {
-  const items = ["Dashboard", "Clientes", "Campanas", "Piezas", "Aprobaciones", "Reportes"];
+  const items: Array<{ label: string; href?: string }> = [
+    { label: "Dashboard", href: "/" },
+    { label: "Clientes", href: "/clients" },
+    { label: "Campanas" },
+    { label: "Piezas" },
+    { label: "Aprobaciones" },
+    { label: "Reportes" }
+  ];
   return (
     <aside className="rounded-3xl border border-white/70 bg-gradient-to-b from-white to-slate-50 p-4">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-700">CreativeFlow</p>
@@ -45,12 +52,19 @@ function SideMenu() {
       <div className="mt-5 space-y-1">
         {items.map((item, index) => (
           <div
-            key={item}
-            className={`rounded-xl px-3 py-2 text-sm font-medium ${
-              index === 0 ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"
-            }`}
+            key={item.label}
+            className={`rounded-xl px-3 py-2 text-sm font-medium ${index === 0 ? "bg-slate-900 text-white" : "text-slate-600"}`}
           >
-            {item}
+            {item.href ? (
+              <Link href={item.href} className={`block ${index === 0 ? "text-white" : "hover:text-slate-900"}`}>
+                {item.label}
+              </Link>
+            ) : (
+              <div className="flex items-center justify-between">
+                <span>{item.label}</span>
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] uppercase tracking-[0.12em] text-slate-500">Soon</span>
+              </div>
+            )}
           </div>
         ))}
       </div>

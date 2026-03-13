@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Manrope, Space_Grotesk } from "next/font/google";
 import { QueryProvider } from "../components/query-provider";
 import { TopNav } from "../components/top-nav";
+import { ToastProvider } from "../components/toast-provider";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -24,8 +25,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <body className={`${manrope.variable} ${spaceGrotesk.variable} font-[var(--font-body)]`}>
         <QueryProvider>
-          <TopNav />
-          <main>{children}</main>
+          <ToastProvider>
+            <TopNav />
+            <main>{children}</main>
+          </ToastProvider>
         </QueryProvider>
       </body>
     </html>

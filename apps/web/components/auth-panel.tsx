@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { apiPost, getStoredToken } from "../lib/api";
+import { useToast } from "./toast-provider";
 
 export function AuthPanel({ onLogin }: { onLogin: (token: string) => void }) {
   const [email, setEmail] = useState("admin@creativeflow.com");
@@ -10,6 +11,7 @@ export function AuthPanel({ onLogin }: { onLogin: (token: string) => void }) {
   const [error, setError] = useState("");
 
   const tokenExists = typeof window !== "undefined" && getStoredToken();
+  const { showToast } = useToast();
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -19,8 +21,10 @@ export function AuthPanel({ onLogin }: { onLogin: (token: string) => void }) {
       const data = await apiPost<{ accessToken: string }>("/auth/login", { email, password });
       localStorage.setItem("creativeflow_token", data.accessToken);
       onLogin(data.accessToken);
+      showToast("Sesion iniciada correctamente", "success");
     } catch (err) {
       setError(err instanceof Error ? err.message : "No fue posible iniciar sesion");
+      showToast("No fue posible iniciar sesion", "error");
     } finally {
       setLoading(false);
     }
@@ -29,6 +33,7 @@ export function AuthPanel({ onLogin }: { onLogin: (token: string) => void }) {
   function handleLogout() {
     localStorage.removeItem("creativeflow_token");
     onLogin("");
+    showToast("Sesion cerrada", "info");
   }
 
   return (

@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet, apiPost, getStoredToken } from "../../lib/api";
+import { useToast } from "../../components/toast-provider";
 
 export default function ClientsPage() {
   const [token] = useState<string>(() => (typeof window !== "undefined" ? getStoredToken() : ""));
   const [form, setForm] = useState({ name: "", company: "", email: "", logoUrl: "" });
+  const { showToast } = useToast();
 
   const { data, refetch, isLoading, error } = useQuery({
     queryKey: ["clients-list", token],
@@ -17,9 +19,14 @@ export default function ClientsPage() {
 
   async function createClient(e: React.FormEvent) {
     e.preventDefault();
-    await apiPost("/clients", form, token);
-    setForm({ name: "", company: "", email: "", logoUrl: "" });
-    refetch();
+    try {
+      await apiPost("/clients", form, token);
+      setForm({ name: "", company: "", email: "", logoUrl: "" });
+      await refetch();
+      showToast("Cliente creado", "success");
+    } catch {
+      showToast("No fue posible crear el cliente", "error");
+    }
   }
 
   if (!token) {
