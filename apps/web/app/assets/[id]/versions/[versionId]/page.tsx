@@ -10,7 +10,7 @@ import { CreativeViewer } from "../../../../../components/creative-viewer";
 export default function AssetVersionReviewPage() {
   const params = useParams<{ id: string; versionId: string }>();
   const [token] = useState<string>(() => (typeof window !== "undefined" ? getStoredToken() : ""));
-  const [draftPin, setDraftPin] = useState<{ x: number; y: number } | null>(null);
+  const [draftPin, setDraftPin] = useState<{ x: number; y: number; timestampSec?: number } | null>(null);
   const [selectedCommentId, setSelectedCommentId] = useState<string>();
 
   const { data: versionData, refetch: refetchVersion } = useQuery({
@@ -27,7 +27,12 @@ export default function AssetVersionReviewPage() {
 
   async function createComment(body: string) {
     if (!draftPin) return;
-    await apiPost(`/comments/version/${params.versionId}`, { body, x: draftPin.x, y: draftPin.y }, token);
+    await apiPost(`/comments/version/${params.versionId}`, {
+      body,
+      x: draftPin.x,
+      y: draftPin.y,
+      timestampSec: draftPin.timestampSec
+    }, token);
     setDraftPin(null);
     await refetchComments();
   }
@@ -92,6 +97,7 @@ export default function AssetVersionReviewPage() {
         {versionData?.fileUrl ? (
           <CreativeViewer
             fileUrl={versionData.fileUrl}
+            assetKind={versionData?.asset?.kind}
             comments={comments}
             onCreateComment={(pin) => setDraftPin(pin)}
             onSelectComment={setSelectedCommentId}

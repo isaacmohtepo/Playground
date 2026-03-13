@@ -9,7 +9,7 @@ import { CreativeViewer } from "../../../components/creative-viewer";
 
 export default function PublicReviewPage() {
   const params = useParams<{ token: string }>();
-  const [draftPin, setDraftPin] = useState<{ x: number; y: number } | null>(null);
+  const [draftPin, setDraftPin] = useState<{ x: number; y: number; timestampSec?: number } | null>(null);
   const [selectedCommentId, setSelectedCommentId] = useState<string>();
   const [name, setName] = useState("Cliente");
   const [email, setEmail] = useState("cliente@example.com");
@@ -26,7 +26,8 @@ export default function PublicReviewPage() {
       email,
       body,
       x: draftPin.x,
-      y: draftPin.y
+      y: draftPin.y,
+      timestampSec: draftPin.timestampSec
     });
     setDraftPin(null);
     await refetch();
@@ -79,6 +80,7 @@ export default function PublicReviewPage() {
         {data?.latestVersion?.fileUrl ? (
           <CreativeViewer
             fileUrl={data.latestVersion.fileUrl}
+            assetKind={data?.asset?.kind}
             comments={data.comments || []}
             onCreateComment={setDraftPin}
             onSelectComment={setSelectedCommentId}
