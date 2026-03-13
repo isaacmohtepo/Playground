@@ -36,8 +36,8 @@ export function AuthPanel({ onLogin }: { onLogin: (token: string) => void }) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="pill bg-brand-100 text-brand-900">Workspace de agencia</p>
-          <h2 className="mt-3 font-[var(--font-display)] text-2xl font-semibold">Acceso seguro</h2>
-          <p className="mt-1 text-sm muted">Gestiona clientes, campañas y aprobaciones en un solo flujo.</p>
+          <h2 className="mt-3 font-[var(--font-display)] text-3xl font-semibold">Acceso seguro</h2>
+          <p className="mt-1 text-sm muted">Gestiona clientes, campanas y aprobaciones en un solo flujo.</p>
         </div>
       </div>
 

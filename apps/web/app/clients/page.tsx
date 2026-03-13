@@ -32,7 +32,7 @@ export default function ClientsPage() {
 
   return (
     <div className="container-page grid gap-6 lg:grid-cols-[1fr_380px]">
-      <section className="card p-6">
+      <section className="card reveal p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-[var(--font-display)] text-3xl font-semibold">Clientes</h2>
           <span className="pill bg-slate-100 text-slate-700">{data?.length ?? 0} registrados</span>
@@ -50,9 +50,9 @@ export default function ClientsPage() {
         </div>
       </section>
 
-      <aside className="card-strong p-6">
+      <aside className="card-strong reveal delay-1 p-6">
         <h3 className="font-[var(--font-display)] text-2xl font-semibold">Nuevo cliente</h3>
-        <p className="mt-1 text-sm muted">Agrega la cuenta del cliente para iniciar campañas y revisiones.</p>
+        <p className="mt-1 text-sm muted">Agrega la cuenta del cliente para iniciar campanas y revisiones.</p>
         <form onSubmit={createClient} className="mt-5 grid gap-3">
           <input className="input" placeholder="Nombre" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           <input className="input" placeholder="Empresa" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
