@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import Image from "next/image";
 
 type CommentItem = {
@@ -32,6 +32,8 @@ function guessKind(url: string) {
 
 export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, onSelectComment, selectedCommentId, studioMode = false }: CreativeViewerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [pinMode, setPinMode] = useState(true);
+  const [hoverPoint, setHoverPoint] = useState<{ x: number; y: number } | null>(null);
   const effectiveKind = assetKind ?? guessKind(fileUrl);
   const pins = useMemo(
     () =>
@@ -42,7 +44,10 @@ export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, 
     [comments]
   );
 
-  function handleClick(e: React.MouseEvent<HTMLDivElement>) {
+  function handleCreatePin(e: React.MouseEvent<HTMLDivElement>) {
+    if (!pinMode) {
+      return;
+    }
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
@@ -71,18 +76,59 @@ export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, 
 
   return (
     <div className={`${studioMode ? "h-full rounded-2xl border border-slate-700 bg-slate-900/80 p-3" : "card p-4"}`}>
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <p className={`text-xs ${studioMode ? "text-slate-300" : "muted"}`}>
+          {pinMode ? "Modo comentar activo: haz click para crear un pin." : "Modo navegar activo: puedes interactuar con la pieza."}
+        </p>
+        <div className="flex rounded-xl border border-slate-600/60 bg-slate-900/60 p-1 text-xs">
+          <button
+            type="button"
+            className={`rounded-lg px-3 py-1.5 font-semibold transition ${pinMode ? "bg-brand-500 text-white" : "text-slate-300 hover:bg-slate-700/60"}`}
+            onClick={() => setPinMode(true)}
+          >
+            Comentar
+          </button>
+          <button
+            type="button"
+            className={`rounded-lg px-3 py-1.5 font-semibold transition ${!pinMode ? "bg-slate-200 text-slate-900" : "text-slate-300 hover:bg-slate-700/60"}`}
+            onClick={() => setPinMode(false)}
+          >
+            Navegar
+          </button>
+        </div>
+      </div>
+
       <div
         className={`relative overflow-hidden rounded-2xl ${
           studioMode ? "border border-slate-700 bg-slate-950 h-[calc(100vh-170px)]" : "border border-slate-200 bg-white"
         } ${!studioMode && (effectiveKind === "PDF" || effectiveKind === "LANDING_PAGE") ? "h-[560px]" : !studioMode ? "aspect-video" : ""}`}
-        onClick={handleClick}
       >
         {renderMedia()}
+        <div
+          className={`absolute inset-0 z-10 transition ${pinMode ? "cursor-crosshair bg-transparent" : "pointer-events-none bg-transparent"}`}
+          onClick={handleCreatePin}
+          onMouseMove={(e) => {
+            if (!pinMode) {
+              return;
+            }
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            setHoverPoint({ x, y });
+          }}
+          onMouseLeave={() => setHoverPoint(null)}
+        />
+        {pinMode && hoverPoint ? (
+          <div
+            className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-brand-300/80 bg-brand-500/20"
+            style={{ left: `${hoverPoint.x}%`, top: `${hoverPoint.y}%`, width: 22, height: 22 }}
+          />
+        ) : null}
         {pins.map((pin) => (
           <button
             key={pin.id}
             style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
-            className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full px-2 py-1 text-xs font-bold text-white shadow ${
+            className={`absolute z-30 -translate-x-1/2 -translate-y-1/2 rounded-full px-2 py-1 text-xs font-bold text-white shadow transition hover:scale-105 ${
               selectedCommentId === pin.id ? "bg-slate-900" : pin.isResolved ? "bg-emerald-500" : "bg-brand-500"
             }`}
             onClick={(e) => {
@@ -95,7 +141,7 @@ export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, 
         ))}
       </div>
       <p className={`mt-3 text-xs ${studioMode ? "text-slate-300" : "muted"}`}>
-        Haz click en cualquier area del creativo para crear un comentario visual.
+        Activa Comentar para colocar pins. Activa Navegar para interactuar con landing, video o PDF.
         {(effectiveKind === "LANDING_PAGE" || effectiveKind === "PDF") && (
           <>
             {" "}
