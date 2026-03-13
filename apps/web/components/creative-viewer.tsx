@@ -32,10 +32,12 @@ function guessKind(url: string) {
 
 export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, onSelectComment, selectedCommentId, studioMode = false }: CreativeViewerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const effectiveKind = assetKind ?? guessKind(fileUrl);
   const prefersNavigateByDefault = effectiveKind === "LANDING_PAGE" || effectiveKind === "PDF";
   const [pinMode, setPinMode] = useState(!prefersNavigateByDefault);
   const [hoverPoint, setHoverPoint] = useState<{ x: number; y: number } | null>(null);
+  const [canvasHeight, setCanvasHeight] = useState(2200);
   const pins = useMemo(
     () =>
       comments.map((comment, index) => ({
@@ -67,10 +69,44 @@ export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, 
       return <video ref={videoRef} src={fileUrl} controls playsInline className="h-full w-full object-contain" />;
     }
     if (effectiveKind === "PDF") {
-      return <iframe src={fileUrl} title="PDF preview" className="h-full w-full bg-white" />;
+      return (
+        <iframe
+          ref={iframeRef}
+          src={fileUrl}
+          title="PDF preview"
+          className="h-full w-full bg-white"
+          onLoad={() => {
+            try {
+              const detectedHeight = iframeRef.current?.contentWindow?.document?.documentElement?.scrollHeight;
+              if (detectedHeight && Number.isFinite(detectedHeight)) {
+                setCanvasHeight(Math.max(1200, Math.min(12000, detectedHeight)));
+              }
+            } catch {
+              return;
+            }
+          }}
+        />
+      );
     }
     if (effectiveKind === "LANDING_PAGE") {
-      return <iframe src={fileUrl} title="Landing preview" className="h-full w-full bg-white" />;
+      return (
+        <iframe
+          ref={iframeRef}
+          src={fileUrl}
+          title="Landing preview"
+          className="h-full w-full bg-white"
+          onLoad={() => {
+            try {
+              const detectedHeight = iframeRef.current?.contentWindow?.document?.documentElement?.scrollHeight;
+              if (detectedHeight && Number.isFinite(detectedHeight)) {
+                setCanvasHeight(Math.max(1200, Math.min(12000, detectedHeight)));
+              }
+            } catch {
+              return;
+            }
+          }}
+        />
+      );
     }
     return <Image src={fileUrl} alt="Creative preview" width={1600} height={900} className="h-full w-full object-contain" unoptimized />;
   }
@@ -98,48 +134,113 @@ export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, 
           </button>
         </div>
       </div>
+      {effectiveKind === "LANDING_PAGE" || effectiveKind === "PDF" ? (
+        <div className="mb-2 flex items-center justify-end gap-2 text-xs">
+          <span className={`${studioMode ? "text-slate-400" : "muted"}`}>Alto lienzo</span>
+          <button
+            type="button"
+            className={`rounded-md border px-2 py-1 ${studioMode ? "border-slate-600 text-slate-200 hover:bg-slate-700/60" : "border-slate-300 text-slate-700 hover:bg-slate-100"}`}
+            onClick={() => setCanvasHeight((v) => Math.max(1200, v - 400))}
+          >
+            -
+          </button>
+          <span className={`${studioMode ? "text-slate-200" : "text-slate-700"}`}>{canvasHeight}px</span>
+          <button
+            type="button"
+            className={`rounded-md border px-2 py-1 ${studioMode ? "border-slate-600 text-slate-200 hover:bg-slate-700/60" : "border-slate-300 text-slate-700 hover:bg-slate-100"}`}
+            onClick={() => setCanvasHeight((v) => Math.min(12000, v + 400))}
+          >
+            +
+          </button>
+        </div>
+      ) : null}
 
       <div
         className={`relative overflow-hidden rounded-2xl ${
           studioMode ? "h-[70vh] min-h-[460px] border border-slate-700 bg-slate-950" : "border border-slate-200 bg-white"
         } ${!studioMode && (effectiveKind === "PDF" || effectiveKind === "LANDING_PAGE") ? "h-[560px]" : !studioMode ? "aspect-video" : ""}`}
       >
-        {renderMedia()}
-        <div
-          className={`absolute inset-0 z-10 transition ${pinMode ? "cursor-crosshair bg-transparent" : "pointer-events-none bg-transparent"}`}
-          onClick={handleCreatePin}
-          onMouseMove={(e) => {
-            if (!pinMode) {
-              return;
-            }
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            setHoverPoint({ x, y });
-          }}
-          onMouseLeave={() => setHoverPoint(null)}
-        />
-        {pinMode && hoverPoint ? (
-          <div
-            className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-brand-300/80 bg-brand-500/20"
-            style={{ left: `${hoverPoint.x}%`, top: `${hoverPoint.y}%`, width: 22, height: 22 }}
-          />
-        ) : null}
-        {pins.map((pin) => (
-          <button
-            key={pin.id}
-            style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
-            className={`absolute z-30 -translate-x-1/2 -translate-y-1/2 rounded-full px-2 py-1 text-xs font-bold text-white shadow transition hover:scale-105 ${
-              selectedCommentId === pin.id ? "bg-slate-900" : pin.isResolved ? "bg-emerald-500" : "bg-brand-500"
-            }`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelectComment(pin.id);
-            }}
-          >
-            {pin.number}
-          </button>
-        ))}
+        {effectiveKind === "LANDING_PAGE" || effectiveKind === "PDF" ? (
+          <div className="h-full overflow-auto">
+            <div className="relative" style={{ height: `${canvasHeight}px` }}>
+              {renderMedia()}
+              <div
+                className={`absolute inset-0 z-10 transition ${pinMode ? "cursor-crosshair bg-transparent" : "pointer-events-none bg-transparent"}`}
+                onClick={handleCreatePin}
+                onMouseMove={(e) => {
+                  if (!pinMode) {
+                    return;
+                  }
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = ((e.clientX - rect.left) / rect.width) * 100;
+                  const y = ((e.clientY - rect.top) / rect.height) * 100;
+                  setHoverPoint({ x, y });
+                }}
+                onMouseLeave={() => setHoverPoint(null)}
+              />
+              {pinMode && hoverPoint ? (
+                <div
+                  className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-brand-300/80 bg-brand-500/20"
+                  style={{ left: `${hoverPoint.x}%`, top: `${hoverPoint.y}%`, width: 22, height: 22 }}
+                />
+              ) : null}
+              {pins.map((pin) => (
+                <button
+                  key={pin.id}
+                  style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
+                  className={`absolute z-30 -translate-x-1/2 -translate-y-1/2 rounded-full px-2 py-1 text-xs font-bold text-white shadow transition hover:scale-105 ${
+                    selectedCommentId === pin.id ? "bg-slate-900" : pin.isResolved ? "bg-emerald-500" : "bg-brand-500"
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectComment(pin.id);
+                  }}
+                >
+                  {pin.number}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <>
+            {renderMedia()}
+            <div
+              className={`absolute inset-0 z-10 transition ${pinMode ? "cursor-crosshair bg-transparent" : "pointer-events-none bg-transparent"}`}
+              onClick={handleCreatePin}
+              onMouseMove={(e) => {
+                if (!pinMode) {
+                  return;
+                }
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                setHoverPoint({ x, y });
+              }}
+              onMouseLeave={() => setHoverPoint(null)}
+            />
+            {pinMode && hoverPoint ? (
+              <div
+                className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-brand-300/80 bg-brand-500/20"
+                style={{ left: `${hoverPoint.x}%`, top: `${hoverPoint.y}%`, width: 22, height: 22 }}
+              />
+            ) : null}
+            {pins.map((pin) => (
+              <button
+                key={pin.id}
+                style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
+                className={`absolute z-30 -translate-x-1/2 -translate-y-1/2 rounded-full px-2 py-1 text-xs font-bold text-white shadow transition hover:scale-105 ${
+                  selectedCommentId === pin.id ? "bg-slate-900" : pin.isResolved ? "bg-emerald-500" : "bg-brand-500"
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectComment(pin.id);
+                }}
+              >
+                {pin.number}
+              </button>
+            ))}
+          </>
+        )}
       </div>
       <p className={`mt-3 text-xs ${studioMode ? "text-slate-300" : "muted"}`}>
         Activa Comentar para colocar pins. Activa Navegar para interactuar con landing, video o PDF.
