@@ -32,9 +32,10 @@ function guessKind(url: string) {
 
 export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, onSelectComment, selectedCommentId, studioMode = false }: CreativeViewerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [pinMode, setPinMode] = useState(true);
-  const [hoverPoint, setHoverPoint] = useState<{ x: number; y: number } | null>(null);
   const effectiveKind = assetKind ?? guessKind(fileUrl);
+  const prefersNavigateByDefault = effectiveKind === "LANDING_PAGE" || effectiveKind === "PDF";
+  const [pinMode, setPinMode] = useState(!prefersNavigateByDefault);
+  const [hoverPoint, setHoverPoint] = useState<{ x: number; y: number } | null>(null);
   const pins = useMemo(
     () =>
       comments.map((comment, index) => ({
@@ -75,7 +76,7 @@ export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, 
   }
 
   return (
-    <div className={`${studioMode ? "h-full rounded-2xl border border-slate-700 bg-slate-900/80 p-3" : "card p-4"}`}>
+    <div className={`${studioMode ? "rounded-2xl border border-slate-700 bg-slate-900/80 p-3" : "card p-4"}`}>
       <div className="mb-3 flex items-center justify-between gap-2">
         <p className={`text-xs ${studioMode ? "text-slate-300" : "muted"}`}>
           {pinMode ? "Modo comentar activo: haz click para crear un pin." : "Modo navegar activo: puedes interactuar con la pieza."}
@@ -100,7 +101,7 @@ export function CreativeViewer({ fileUrl, assetKind, comments, onCreateComment, 
 
       <div
         className={`relative overflow-hidden rounded-2xl ${
-          studioMode ? "border border-slate-700 bg-slate-950 h-[calc(100vh-170px)]" : "border border-slate-200 bg-white"
+          studioMode ? "h-[70vh] min-h-[460px] border border-slate-700 bg-slate-950" : "border border-slate-200 bg-white"
         } ${!studioMode && (effectiveKind === "PDF" || effectiveKind === "LANDING_PAGE") ? "h-[560px]" : !studioMode ? "aspect-video" : ""}`}
       >
         {renderMedia()}

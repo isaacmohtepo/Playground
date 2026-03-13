@@ -87,7 +87,7 @@ export default function AssetVersionReviewPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 px-3 py-3 text-slate-100 md:px-4">
+    <main className="min-h-screen bg-slate-950 px-3 py-3 pb-8 text-slate-100 md:px-4">
       <div className="mb-3 rounded-2xl border border-slate-700 bg-slate-900/80 p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

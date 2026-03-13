@@ -40,7 +40,13 @@ export function CommentsPanel({
   const [replyBodies, setReplyBodies] = useState<Record<string, string>>({});
 
   return (
-    <aside className={`${studioMode ? "flex h-[calc(100vh-24px)] flex-col rounded-2xl border border-slate-700 bg-slate-900/85 p-4 text-slate-100" : "card flex h-[80vh] flex-col p-4"}`}>
+    <aside
+      className={`${
+        studioMode
+          ? "flex min-h-[460px] flex-col rounded-2xl border border-slate-700 bg-slate-900/85 p-4 text-slate-100 lg:sticky lg:top-3 lg:max-h-[calc(100vh-24px)]"
+          : "card flex h-[80vh] flex-col p-4"
+      }`}
+    >
       <h3 className="font-[var(--font-display)] text-xl font-semibold">Comentarios</h3>
       {draftPin ? (
         <div className={`mt-3 rounded-2xl border p-3 ${studioMode ? "border-brand-500/40 bg-brand-500/10" : "border-brand-200 bg-brand-50"}`}>
